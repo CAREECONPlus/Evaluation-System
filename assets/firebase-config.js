@@ -1,606 +1,340 @@
-/**
- * firebase-config.js - Firebase設定と初期化
- * 無料のFirestoreデータベース接続
- */
+// ====================================
+// 2. 統合翻訳システム (Hybrid Translation)
+// ====================================
 
-// Firebase SDK（CDN版を使用 - 軽量）
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { 
-    getFirestore, 
-    collection, 
-    doc, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
-    getDoc, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy, 
-    limit,
-    onSnapshot,
-    serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-/**
- * Firebase設定
- * 実際の値は環境変数または設定ファイルから取得
- */
-const firebaseConfig = {
-    // デモ用設定（実際の使用時は置き換える）
-    apiKey: "demo-api-key",
-    authDomain: "evaluation-system-demo.firebaseapp.com",
-    projectId: "evaluation-system-demo",
-    storageBucket: "evaluation-system-demo.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
-};
-
-/**
- * Firebase初期化
- */
-class FirebaseManager {
+// 統合翻訳システム（辞書翻訳 + API翻訳 + キャッシュ）
+class HybridTranslator {
     constructor() {
-        this.app = null;
-        this.db = null;
-        this.auth = null;
-        this.initialized = false;
-        this.isOnline = navigator.onLine;
+        this.currentLanguage = 'ja';
+        this.translations = {};
+        this.translationCache = new Map();
+        this.apiQueue = [];
+        this.isTranslating = false;
+        this.fallbackTranslations = {
+            ja: {
+                'system.title': '建設業評価システム',
+                'system.subtitle': 'システムにログインしてください',
+                'system.loading': '読み込み中...',
+                'system.saving': '保存中...',
+                'system.error': 'エラーが発生しました',
+                'system.success': '操作が完了しました',
+                'login.email': 'メールアドレス',
+                'login.password': 'パスワード',
+                'login.submit': 'ログイン',
+                'login.demo': 'デモアカウント',
+                'login.welcome': 'さん、おかえりなさい！',
+                'login.failed': 'ログインに失敗しました',
+                'nav.dashboard': '📊 ダッシュボード',
+                'nav.evaluations': '📝 評価管理',
+                'nav.users': '👥 ユーザー管理',
+                'nav.logout': '🚪 ログアウト',
+                'dashboard.title': 'ダッシュボード',
+                'evaluation.create': '新規評価作成',
+                'evaluation.list': '評価一覧',
+                'evaluation.edit': '評価編集',
+                'user.create': '新規ユーザー作成',
+                'user.list': 'ユーザー一覧'
+            },
+            vi: {
+                'system.title': 'Hệ thống đánh giá xây dựng',
+                'system.subtitle': 'Vui lòng đăng nhập vào hệ thống',
+                'system.loading': 'Đang tải...',
+                'system.saving': 'Đang lưu...',
+                'system.error': 'Đã xảy ra lỗi',
+                'system.success': 'Hoàn thành thao tác',
+                'login.email': 'Địa chỉ email',
+                'login.password': 'Mật khẩu',
+                'login.submit': 'Đăng nhập',
+                'login.demo': 'Tài khoản demo',
+                'login.welcome': ', chào mừng trở lại!',
+                'login.failed': 'Đăng nhập thất bại',
+                'nav.dashboard': '📊 Bảng điều khiển',
+                'nav.evaluations': '📝 Quản lý đánh giá',
+                'nav.users': '👥 Quản lý người dùng',
+                'nav.logout': '🚪 Đăng xuất',
+                'dashboard.title': 'Bảng điều khiển',
+                'evaluation.create': 'Tạo đánh giá mới',
+                'evaluation.list': 'Danh sách đánh giá',
+                'evaluation.edit': 'Chỉnh sửa đánh giá',
+                'user.create': 'Tạo người dùng mới',
+                'user.list': 'Danh sách người dùng'
+            },
+            en: {
+                'system.title': 'Construction Evaluation System',
+                'system.subtitle': 'Please login to the system',
+                'system.loading': 'Loading...',
+                'system.saving': 'Saving...',
+                'system.error': 'An error occurred',
+                'system.success': 'Operation completed',
+                'login.email': 'Email Address',
+                'login.password': 'Password',
+                'login.submit': 'Login',
+                'login.demo': 'Demo Account',
+                'login.welcome': ', welcome back!',
+                'login.failed': 'Login failed',
+                'nav.dashboard': '📊 Dashboard',
+                'nav.evaluations': '📝 Evaluation Management',
+                'nav.users': '👥 User Management',
+                'nav.logout': '🚪 Logout',
+                'dashboard.title': 'Dashboard',
+                'evaluation.create': 'Create New Evaluation',
+                'evaluation.list': 'Evaluation List',
+                'evaluation.edit': 'Edit Evaluation',
+                'user.create': 'Create New User',
+                'user.list': 'User List'
+            }
+        };
         
-        // オフライン対応
-        this.setupOfflineHandling();
+        this.init();
     }
 
-    /**
-     * Firebase初期化
-     */
-    async init(config = firebaseConfig) {
+    async init() {
         try {
-            console.log('🔥 Initializing Firebase...');
+            // 保存されている言語設定を読み込み
+            const savedLanguage = localStorage.getItem('eval_language') || 'ja';
             
-            // Firebase アプリ初期化
-            this.app = initializeApp(config);
+            // 翻訳辞書を読み込み
+            await this.loadTranslations();
             
-            // Firestore 初期化
-            this.db = getFirestore(this.app);
+            // 言語設定
+            this.setLanguage(savedLanguage);
             
-            // Authentication 初期化
-            this.auth = getAuth(this.app);
-            
-            // オフライン永続化を有効にする
-            await this.enableOfflinePersistence();
-            
-            this.initialized = true;
-            console.log('✅ Firebase initialized successfully');
-            
-            return true;
-            
+            console.log('🌐 Translation system initialized');
         } catch (error) {
-            console.error('❌ Firebase initialization failed:', error);
-            
-            // フォールバック: ローカルストレージモード
-            this.enableLocalStorageMode();
-            
-            throw error;
+            console.warn('Translation system init failed:', error);
+            // フォールバック：内蔵辞書を使用
+            this.translations = this.fallbackTranslations;
         }
     }
 
-    /**
-     * オフライン永続化有効化
-     */
-    async enableOfflinePersistence() {
+    async loadTranslations() {
         try {
-            // Firestoreのオフライン永続化
-            // Note: 実際の実装では enablePersistence() を使用
-            console.log('📱 Offline persistence enabled');
-        } catch (error) {
-            console.warn('⚠️ Offline persistence failed:', error);
-        }
-    }
-
-    /**
-     * ローカルストレージフォールバックモード
-     */
-    enableLocalStorageMode() {
-        console.log('💾 Fallback to localStorage mode');
-        this.isLocalMode = true;
-        // ローカルストレージを使用したデータ管理
-    }
-
-    /**
-     * オフライン対応設定
-     */
-    setupOfflineHandling() {
-        window.addEventListener('online', () => {
-            this.isOnline = true;
-            console.log('🌐 Back online');
-            this.syncPendingChanges();
-        });
-
-        window.addEventListener('offline', () => {
-            this.isOnline = false;
-            console.log('📴 Gone offline');
-        });
-    }
-
-    /**
-     * オフライン時の変更を同期
-     */
-    async syncPendingChanges() {
-        // 実装: オフライン時に蓄積された変更をFirebaseに同期
-        console.log('🔄 Syncing pending changes...');
-    }
-
-    /**
-     * データベース操作: 作成
-     */
-    async create(collectionName, data) {
-        try {
-            if (this.isLocalMode) {
-                return this.createLocal(collectionName, data);
-            }
-
-            const docRef = await addDoc(collection(this.db, collectionName), {
-                ...data,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            });
-            
-            console.log(`✅ Document created: ${docRef.id}`);
-            return { id: docRef.id, ...data };
-            
-        } catch (error) {
-            console.error('❌ Create failed:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * データベース操作: 読み取り（単一）
-     */
-    async get(collectionName, id) {
-        try {
-            if (this.isLocalMode) {
-                return this.getLocal(collectionName, id);
-            }
-
-            const docRef = doc(this.db, collectionName, id);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                return { id: docSnap.id, ...docSnap.data() };
+            const response = await fetch('./config/translations.json');
+            if (response.ok) {
+                const data = await response.json();
+                this.translations = data;
+                console.log('📚 External translations loaded');
             } else {
-                throw new Error('Document not found');
+                throw new Error('Failed to load translations.json');
             }
-            
         } catch (error) {
-            console.error('❌ Get failed:', error);
-            throw error;
+            console.warn('Using fallback translations:', error);
+            this.translations = this.fallbackTranslations;
         }
     }
 
-    /**
-     * データベース操作: 読み取り（複数）
-     */
-    async getAll(collectionName, conditions = {}) {
-        try {
-            if (this.isLocalMode) {
-                return this.getAllLocal(collectionName, conditions);
-            }
-
-            let q = collection(this.db, collectionName);
-            
-            // 条件追加
-            if (conditions.where) {
-                conditions.where.forEach(condition => {
-                    q = query(q, where(...condition));
-                });
-            }
-            
-            if (conditions.orderBy) {
-                q = query(q, orderBy(...conditions.orderBy));
-            }
-            
-            if (conditions.limit) {
-                q = query(q, limit(conditions.limit));
-            }
-
-            const querySnapshot = await getDocs(q);
-            const results = [];
-            
-            querySnapshot.forEach((doc) => {
-                results.push({ id: doc.id, ...doc.data() });
-            });
-            
-            return results;
-            
-        } catch (error) {
-            console.error('❌ GetAll failed:', error);
-            throw error;
-        }
+    // 翻訳テキスト取得（メインメソッド）
+    t(key, params = {}) {
+        const translation = this.getTranslation(key);
+        return this.interpolate(translation, params);
     }
 
-    /**
-     * データベース操作: 更新
-     */
-    async update(collectionName, id, data) {
-        try {
-            if (this.isLocalMode) {
-                return this.updateLocal(collectionName, id, data);
-            }
-
-            const docRef = doc(this.db, collectionName, id);
-            await updateDoc(docRef, {
-                ...data,
-                updatedAt: serverTimestamp()
-            });
-            
-            console.log(`✅ Document updated: ${id}`);
-            return { id, ...data };
-            
-        } catch (error) {
-            console.error('❌ Update failed:', error);
-            throw error;
+    getTranslation(key) {
+        // 現在の言語の辞書をチェック
+        const currentDict = this.translations[this.currentLanguage];
+        if (currentDict && this.hasNestedProperty(currentDict, key)) {
+            return this.getNestedProperty(currentDict, key);
         }
+
+        // フォールバック：日本語
+        const fallbackDict = this.translations.ja;
+        if (fallbackDict && this.hasNestedProperty(fallbackDict, key)) {
+            console.warn(`Translation missing for ${key} in ${this.currentLanguage}, using Japanese fallback`);
+            return this.getNestedProperty(fallbackDict, key);
+        }
+
+        // 最終フォールバック：キー自体
+        console.warn(`Translation missing for ${key}`);
+        return key;
     }
 
-    /**
-     * データベース操作: 削除
-     */
-    async delete(collectionName, id) {
-        try {
-            if (this.isLocalMode) {
-                return this.deleteLocal(collectionName, id);
-            }
-
-            const docRef = doc(this.db, collectionName, id);
-            await deleteDoc(docRef);
-            
-            console.log(`✅ Document deleted: ${id}`);
-            return true;
-            
-        } catch (error) {
-            console.error('❌ Delete failed:', error);
-            throw error;
-        }
+    // ネストされたオブジェクトのプロパティ取得
+    hasNestedProperty(obj, path) {
+        return path.split('.').reduce((current, key) => {
+            return current && current.hasOwnProperty(key) ? current[key] : null;
+        }, obj) !== null;
     }
 
-    /**
-     * リアルタイム監視
-     */
-    onSnapshot(collectionName, callback, conditions = {}) {
-        if (this.isLocalMode) {
-            // ローカルモードではポーリング
-            return this.pollLocal(collectionName, callback, conditions);
-        }
+    getNestedProperty(obj, path) {
+        return path.split('.').reduce((current, key) => {
+            return current && current[key] ? current[key] : null;
+        }, obj);
+    }
 
-        let q = collection(this.db, collectionName);
-        
-        // 条件追加
-        if (conditions.where) {
-            conditions.where.forEach(condition => {
-                q = query(q, where(...condition));
-            });
-        }
-
-        return onSnapshot(q, (querySnapshot) => {
-            const results = [];
-            querySnapshot.forEach((doc) => {
-                results.push({ id: doc.id, ...doc.data() });
-            });
-            callback(results);
+    // パラメータ補間
+    interpolate(text, params) {
+        if (typeof text !== 'string') return text;
+        return text.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+            return params[key] !== undefined ? params[key] : match;
         });
     }
 
-    /**
-     * 認証: ログイン
-     */
-    async signIn(email, password) {
-        try {
-            const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-            return userCredential.user;
-        } catch (error) {
-            console.error('❌ Sign in failed:', error);
-            throw error;
+    // 言語切り替え
+    setLanguage(language) {
+        if (!this.translations[language]) {
+            console.warn(`Language ${language} not supported, using Japanese`);
+            language = 'ja';
         }
+
+        this.currentLanguage = language;
+        localStorage.setItem('eval_language', language);
+
+        // DOM更新
+        this.updateDOM();
+
+        // 言語選択UIの更新
+        this.updateLanguageSelectors();
+
+        // イベント発火
+        window.dispatchEvent(new CustomEvent('languageChanged', {
+            detail: { language: this.currentLanguage }
+        }));
+
+        console.log(`🌐 Language changed to: ${language}`);
     }
 
-    /**
-     * 認証: ログアウト
-     */
-    async signOut() {
-        try {
-            await signOut(this.auth);
-            console.log('✅ Signed out successfully');
-        } catch (error) {
-            console.error('❌ Sign out failed:', error);
-            throw error;
-        }
+    // DOM内のテキストを更新
+    updateDOM() {
+        // data-i18n属性を持つ要素
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            element.textContent = this.t(key);
+        });
+
+        // data-i18n-placeholder属性を持つ要素
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-i18n-placeholder');
+            element.placeholder = this.t(key);
+        });
+
+        // data-i18n-title属性を持つ要素
+        document.querySelectorAll('[data-i18n-title]').forEach(element => {
+            const key = element.getAttribute('data-i18n-title');
+            element.title = this.t(key);
+        });
+
+        // 特定のIDを持つ要素の更新
+        this.updateSpecificElements();
     }
 
-    /**
-     * 認証状態監視
-     */
-    onAuthStateChanged(callback) {
-        return onAuthStateChanged(this.auth, callback);
-    }
-
-    // ローカルストレージフォールバック実装
-    createLocal(collectionName, data) {
-        const items = this.getLocalCollection(collectionName);
-        const id = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        const newItem = { id, ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-        items.push(newItem);
-        this.saveLocalCollection(collectionName, items);
-        return newItem;
-    }
-
-    getLocal(collectionName, id) {
-        const items = this.getLocalCollection(collectionName);
-        const item = items.find(item => item.id === id);
-        if (!item) throw new Error('Document not found');
-        return item;
-    }
-
-    getAllLocal(collectionName, conditions = {}) {
-        let items = this.getLocalCollection(collectionName);
-        
-        // 簡易フィルタリング
-        if (conditions.where) {
-            conditions.where.forEach(([field, operator, value]) => {
-                items = items.filter(item => {
-                    switch (operator) {
-                        case '==': return item[field] === value;
-                        case '!=': return item[field] !== value;
-                        case '>': return item[field] > value;
-                        case '<': return item[field] < value;
-                        case '>=': return item[field] >= value;
-                        case '<=': return item[field] <= value;
-                        default: return true;
-                    }
-                });
-            });
-        }
-        
-        return items;
-    }
-
-    updateLocal(collectionName, id, data) {
-        const items = this.getLocalCollection(collectionName);
-        const index = items.findIndex(item => item.id === id);
-        if (index === -1) throw new Error('Document not found');
-        
-        items[index] = { ...items[index], ...data, updatedAt: new Date().toISOString() };
-        this.saveLocalCollection(collectionName, items);
-        return items[index];
-    }
-
-    deleteLocal(collectionName, id) {
-        const items = this.getLocalCollection(collectionName);
-        const filteredItems = items.filter(item => item.id !== id);
-        this.saveLocalCollection(collectionName, filteredItems);
-        return true;
-    }
-
-    getLocalCollection(collectionName) {
-        try {
-            const data = localStorage.getItem(`firebase_${collectionName}`);
-            return data ? JSON.parse(data) : [];
-        } catch (error) {
-            console.error('Failed to get local collection:', error);
-            return [];
-        }
-    }
-
-    saveLocalCollection(collectionName, items) {
-        try {
-            localStorage.setItem(`firebase_${collectionName}`, JSON.stringify(items));
-        } catch (error) {
-            console.error('Failed to save local collection:', error);
-        }
-    }
-
-    pollLocal(collectionName, callback, conditions = {}) {
-        const poll = () => {
-            const items = this.getAllLocal(collectionName, conditions);
-            callback(items);
+    updateSpecificElements() {
+        const elementMappings = {
+            'login-title': 'system.title',
+            'login-subtitle': 'system.subtitle',
+            'email-label': 'login.email',
+            'password-label': 'login.password',
+            'login-submit': 'login.submit',
+            'demo-title': 'login.demo',
+            'header-title': 'system.title'
         };
-        
-        // 5秒ごとにポーリング
-        const interval = setInterval(poll, 5000);
-        
-        // 初回実行
-        poll();
-        
-        // クリーンアップ関数を返す
-        return () => clearInterval(interval);
-    }
 
-    /**
-     * 設定情報取得
-     */
-    getConfig() {
-        return {
-            initialized: this.initialized,
-            isOnline: this.isOnline,
-            isLocalMode: this.isLocalMode || false,
-            projectId: this.app?.options?.projectId
-        };
-    }
-
-    /**
-     * 統計情報取得
-     */
-    async getStats() {
-        try {
-            const collections = ['users', 'evaluations', 'companies'];
-            const stats = {};
-            
-            for (const collectionName of collections) {
-                const items = await this.getAll(collectionName);
-                stats[collectionName] = {
-                    count: items.length,
-                    lastUpdated: items.length > 0 ? 
-                        Math.max(...items.map(item => new Date(item.updatedAt || item.createdAt).getTime())) : 
-                        null
-                };
+        Object.entries(elementMappings).forEach(([elementId, translationKey]) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = this.t(translationKey);
             }
-            
-            return stats;
-        } catch (error) {
-            console.error('Failed to get stats:', error);
-            return {};
-        }
-    }
-}
-
-/**
- * データアクセス層
- * Firebaseとの実際のやり取りを抽象化
- */
-class DataService {
-    constructor(firebaseManager) {
-        this.firebase = firebaseManager;
-    }
-
-    // ユーザー関連
-    async getUsers() {
-        return await this.firebase.getAll('users', {
-            orderBy: ['createdAt', 'desc']
         });
     }
 
-    async getUserById(id) {
-        return await this.firebase.get('users', id);
-    }
-
-    async createUser(userData) {
-        return await this.firebase.create('users', {
-            ...userData,
-            isActive: true
+    // 言語選択UIの更新
+    updateLanguageSelectors() {
+        const selectors = ['login-language-select', 'header-language-select'];
+        selectors.forEach(selectorId => {
+            const selector = document.getElementById(selectorId);
+            if (selector) {
+                selector.value = this.currentLanguage;
+            }
         });
     }
 
-    async updateUser(id, userData) {
-        return await this.firebase.update('users', id, userData);
-    }
-
-    async deleteUser(id) {
-        return await this.firebase.delete('users', id);
-    }
-
-    // 評価関連
-    async getEvaluations() {
-        return await this.firebase.getAll('evaluations', {
-            orderBy: ['updatedAt', 'desc']
-        });
-    }
-
-    async getEvaluationById(id) {
-        return await this.firebase.get('evaluations', id);
-    }
-
-    async createEvaluation(evaluationData) {
-        return await this.firebase.create('evaluations', {
-            ...evaluationData,
-            status: 'draft'
-        });
-    }
-
-    async updateEvaluation(id, evaluationData) {
-        return await this.firebase.update('evaluations', id, evaluationData);
-    }
-
-    async deleteEvaluation(id) {
-        return await this.firebase.delete('evaluations', id);
-    }
-
-    async getEvaluationsByUser(userId) {
-        return await this.firebase.getAll('evaluations', {
-            where: [['userId', '==', userId]]
-        });
-    }
-
-    // 会社関連
-    async getCompanies() {
-        return await this.firebase.getAll('companies');
-    }
-
-    async getCompanyById(id) {
-        return await this.firebase.get('companies', id);
-    }
-
-    async createCompany(companyData) {
-        return await this.firebase.create('companies', companyData);
-    }
-
-    async updateCompany(id, companyData) {
-        return await this.firebase.update('companies', id, companyData);
-    }
-
-    // 認証関連
-    async signIn(email, password) {
-        const user = await this.firebase.signIn(email, password);
+    // 動的翻訳（API使用）
+    async translateDynamic(text, targetLanguage = null) {
+        const target = targetLanguage || this.currentLanguage;
         
-        // ユーザー情報を取得
+        // 元の言語と同じ場合はそのまま返す
+        if (target === 'ja') return text;
+
+        // キャッシュチェック
+        const cacheKey = `${text}_${target}`;
+        if (this.translationCache.has(cacheKey)) {
+            return this.translationCache.get(cacheKey);
+        }
+
+        // 翻訳キューに追加
+        return new Promise((resolve) => {
+            this.apiQueue.push({
+                text,
+                target,
+                resolve,
+                cacheKey
+            });
+
+            this.processTranslationQueue();
+        });
+    }
+
+    // 翻訳キュー処理
+    async processTranslationQueue() {
+        if (this.isTranslating || this.apiQueue.length === 0) return;
+
+        this.isTranslating = true;
+
         try {
-            const userData = await this.getUserById(user.uid);
-            return { ...user, ...userData };
-        } catch (error) {
-            // ユーザーデータが存在しない場合は基本情報のみ
-            return user;
+            const batch = this.apiQueue.splice(0, 5); // 5件ずつバッチ処理
+
+            for (const item of batch) {
+                try {
+                    const translatedText = await this.callTranslationAPI(item.text, item.target);
+                    this.translationCache.set(item.cacheKey, translatedText);
+                    item.resolve(translatedText);
+                } catch (error) {
+                    console.warn('Translation API failed:', error);
+                    item.resolve(item.text); // フォールバック
+                }
+            }
+        } finally {
+            this.isTranslating = false;
+
+            // キューに残りがあれば再実行
+            if (this.apiQueue.length > 0) {
+                setTimeout(() => this.processTranslationQueue(), 100);
+            }
         }
     }
 
-    async signOut() {
-        return await this.firebase.signOut();
-    }
-
-    onAuthStateChanged(callback) {
-        return this.firebase.onAuthStateChanged(callback);
-    }
-
-    // リアルタイム更新
-    onEvaluationsChange(callback) {
-        return this.firebase.onSnapshot('evaluations', callback, {
-            orderBy: ['updatedAt', 'desc']
-        });
-    }
-
-    onUsersChange(callback) {
-        return this.firebase.onSnapshot('users', callback);
-    }
-}
-
-// グローバルインスタンス作成
-const firebaseManager = new FirebaseManager();
-const dataService = new DataService(firebaseManager);
-
-// グローバルに公開
-if (typeof window !== 'undefined') {
-    window.firebaseManager = firebaseManager;
-    window.dataService = dataService;
-    window.FirebaseManager = FirebaseManager;
-    window.DataService = DataService;
-}
-
-// 自動初期化（デモ用設定で）
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // 実際の設定が利用可能な場合は、それを使用
-        const config = window.FIREBASE_CONFIG || firebaseConfig;
-        await firebaseManager.init(config);
+    // 翻訳API呼び出し（無料のLibreTranslate等を想定）
+    async callTranslationAPI(text, target) {
+        // デモ実装：実際のAPIエンドポイントに変更してください
+        const apiUrl = 'https://libretranslate.de/translate';
         
-        console.log('🔥 Firebase auto-initialized');
-    } catch (error) {
-        console.warn('⚠️ Firebase auto-initialization failed, using local mode:', error);
-    }
-});
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                q: text,
+                source: 'ja',
+                target: target === 'vi' ? 'vi' : 'en',
+                format: 'text'
+            })
+        });
 
-console.log('🔥 firebase-config.js loaded - Firebase connection ready');
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result.translatedText || text;
+    }
+
+    // 現在の言語を取得
+    getCurrentLanguage() {
+        return this.currentLanguage;
+    }
+
+    // サポートされている言語一覧を取得
+    getSupportedLanguages() {
+        return Object.keys(this.translations);
+    }
+}
