@@ -188,20 +188,51 @@
             if (loginForm) {
                 loginForm.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    console.log('📝 Login form submitted');
                     
                     const email = document.getElementById('email').value;
                     const password = document.getElementById('password').value;
+                    
+                    console.log('📧 Email:', email);
+                    console.log('🔐 Password:', password ? '***' : 'empty');
                     
                     // 基本的なログイン処理
                     if (email && password) {
                         // 簡易ログイン（デモ用）
                         if (email === 'admin@company.com' && password === 'password123') {
-                            alert('ログイン成功！（デモモード）');
+                            console.log('✅ Login successful - Demo mode');
+                            
+                            // ログイン成功処理
                             document.body.classList.remove('login-mode');
                             document.body.classList.add('authenticated');
+                            
+                            // ヘッダーを表示
+                            const header = document.getElementById('app-header');
+                            if (header) {
+                                header.style.display = 'block';
+                            }
+                            
+                            // ダッシュボード画面を表示
+                            showDashboard();
+                            
+                        } else if (email === 'manager@company.com' && password === 'password123') {
+                            console.log('✅ Manager login successful');
+                            document.body.classList.remove('login-mode');
+                            document.body.classList.add('authenticated');
+                            showDashboard();
+                            
+                        } else if (email === 'supervisor@company.com' && password === 'password123') {
+                            console.log('✅ Supervisor login successful');
+                            document.body.classList.remove('login-mode'); 
+                            document.body.classList.add('authenticated');
+                            showDashboard();
+                            
                         } else {
-                            alert('ログインに失敗しました');
+                            console.log('❌ Login failed');
+                            alert('ログインに失敗しました。正しいメールアドレスとパスワードを入力してください。');
                         }
+                    } else {
+                        alert('メールアドレスとパスワードを入力してください。');
                     }
                 });
             }
@@ -220,6 +251,110 @@
                 headerLangSelect.addEventListener('change', function() {
                     console.log('Language changed to:', this.value);
                 });
+            }
+        }
+
+        // 簡易ダッシュボード表示関数
+        function showDashboard() {
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                mainContent.innerHTML = `
+                    <div class="page">
+                        <div class="page-header">
+                            <h1 class="page-title">📊 ダッシュボード</h1>
+                        </div>
+                        <div class="page-content">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">12</div>
+                                    <div class="stat-label">総評価数</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">8</div>
+                                    <div class="stat-label">完了済み</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">4.2</div>
+                                    <div class="stat-label">平均評価</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">5</div>
+                                    <div class="stat-label">評価項目</div>
+                                </div>
+                            </div>
+                            
+                            <div class="recent-activity">
+                                <h3>📈 最近の活動</h3>
+                                <div class="activity-list">
+                                    <div style="padding: 1rem; background: white; border-radius: 8px; margin-bottom: 0.5rem; border-left: 4px solid #244EFF;">
+                                        <strong>田中太郎</strong>の評価が完了しました
+                                        <small style="display: block; color: #82889D; margin-top: 0.25rem;">2時間前</small>
+                                    </div>
+                                    <div style="padding: 1rem; background: white; border-radius: 8px; margin-bottom: 0.5rem; border-left: 4px solid #1DCE85;">
+                                        <strong>鈴木次郎</strong>の安全評価が向上しました
+                                        <small style="display: block; color: #82889D; margin-top: 0.25rem;">5時間前</small>
+                                    </div>
+                                    <div style="padding: 1rem; background: white; border-radius: 8px; margin-bottom: 0.5rem; border-left: 4px solid #FFCE2C;">
+                                        <strong>新規評価</strong>の作成が必要です
+                                        <small style="display: block; color: #82889D; margin-top: 0.25rem;">1日前</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 2rem; text-align: center;">
+                                <button class="btn btn-primary" onclick="alert('新規評価作成機能は開発中です')">
+                                    📝 新規評価作成
+                                </button>
+                                <button class="btn btn-secondary" onclick="alert('評価一覧機能は開発中です')" style="margin-left: 1rem;">
+                                    📋 評価一覧
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // ヘッダーメニューも更新
+                const navMenu = document.getElementById('nav-menu');
+                if (navMenu) {
+                    navMenu.innerHTML = `
+                        <li><a href="#" class="nav-link active">📊 ダッシュボード</a></li>
+                        <li><a href="#" class="nav-link">📝 評価管理</a></li>
+                        <li><a href="#" class="nav-link">👥 ユーザー管理</a></li>
+                        <li><a href="#" class="nav-link" onclick="logout()">🚪 ログアウト</a></li>
+                    `;
+                }
+                
+                // ユーザー情報表示
+                const userInfo = document.getElementById('user-info');
+                if (userInfo) {
+                    userInfo.innerHTML = `
+                        <div class="user-avatar">管</div>
+                        <div class="user-details">
+                            <div class="user-name">管理者</div>
+                            <div class="user-role">システム管理者</div>
+                        </div>
+                    `;
+                }
+                
+                console.log('📊 Dashboard displayed');
+            }
+        }
+
+        // ログアウト関数
+        function logout() {
+            console.log('🚪 Logging out');
+            document.body.classList.add('login-mode');
+            document.body.classList.remove('authenticated');
+            
+            const header = document.getElementById('app-header');
+            if (header) {
+                header.style.display = 'none';
+            }
+            
+            // ログインページに戻る
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                location.reload(); // 簡単にページリロード
             }
         }
 
