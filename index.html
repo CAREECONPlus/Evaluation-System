@@ -138,8 +138,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     
     <!-- アプリケーションスクリプト（依存関係順） -->
-    <script src="./assets/firebase-config.js"></script>
     <script src="./assets/app.js"></script>
+    <script src="./assets/firebase-config.js"></script>
     
     <!-- 初期化スクリプト -->
     <script>
@@ -147,19 +147,30 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Construction Evaluation System starting...');
 
+            // 初期化関数が定義されるまで少し待つ
+            if (typeof window.initializeApp === 'undefined') {
+                console.log('⏳ Waiting for app initialization...');
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
             try {
                 // アプリケーション初期化
-                const success = await initializeApp();
-                
-                if (success) {
-                    console.log('✅ System ready');
+                if (typeof window.initializeApp === 'function') {
+                    const success = await window.initializeApp();
                     
-                    // ログイン状態チェック
-                    if (window.auth && window.auth.isLoggedIn()) {
-                        window.app.showDashboard();
+                    if (success) {
+                        console.log('✅ System ready');
+                        
+                        // ログイン状態チェック
+                        if (window.auth && window.auth.isLoggedIn()) {
+                            window.app.showDashboard();
+                        }
+                    } else {
+                        console.error('❌ System initialization failed');
                     }
                 } else {
-                    console.error('❌ System initialization failed');
+                    console.error('❌ initializeApp function not found');
+                    setupFallbackEventListeners();
                 }
                 
             } catch (error) {
