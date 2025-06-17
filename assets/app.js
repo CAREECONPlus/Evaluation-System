@@ -115,7 +115,7 @@ class HybridTranslator {
                 this.translations = data;
                 console.log('📚 External translations loaded');
             } else {
-                throw new Error('Failed to load translations.json');
+                throw new Error(`Failed to load translations.json: ${response.status}`);
             }
         } catch (error) {
             console.warn('Using fallback translations:', error);
