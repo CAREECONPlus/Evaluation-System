@@ -158,136 +158,157 @@
         <div class="loading-text">読み込み中...</div>
     </div>
     
-    <!-- Firebase設定（オプション） -->
+    <!-- Firebase SDK (CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <!-- アプリケーションスクリプト（依存関係順） -->
+    <script src="./assets/firebase-config.js"></script>
+    <script src="./assets/app.js"></script>
+    
+    <!-- 初期化スクリプト -->
     <script>
-        // Firebase設定をグローバルに公開（必要に応じて）
-        window.FIREBASE_CONFIG = null; // 実際の本番環境では設定
-        window.APP_CONFIG = {
-            GAS_TRANSLATION_API_URL: null, // Google Apps Script翻訳API
-            DEBUG_MODE: window.location.hostname === 'localhost'
-        };
-    </script>
-    
-    <!-- メイン統合JavaScript -->
-    <script src="assets/app.js"></script>
-    
-    <!-- Firebase接続（オプション） -->
-    <script src="assets/firebase-config.js" defer></script>
-    
-    <!-- 翻訳システム（オプション） -->
-    <script src="assets/translator.js" defer></script>
-    
-    <!-- 初期化完了後の処理 -->
-    <script>
-        // システム準備完了時の処理
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🏗️ Construction Evaluation System');
-            console.log('📋 Status: Loading...');
-            
-            // アクセシビリティ向上
-            document.addEventListener('keydown', function(e) {
-                // Escキーでモーダルを閉じる
-                if (e.key === 'Escape') {
-                    const modals = document.querySelectorAll('.modal.show');
-                    modals.forEach(modal => {
-                        const closeBtn = modal.querySelector('.modal-close');
-                        if (closeBtn) closeBtn.click();
-                    });
-                }
+        // DOM読み込み完了時に初期化
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Construction Evaluation System starting...');
+
+            try {
+                // アプリケーション初期化
+                const success = await initializeApp();
                 
-                // Alt + 1-9 でクイックナビゲーション
-                if (e.altKey && e.key >= '1' && e.key <= '9') {
-                    e.preventDefault();
-                    const num = parseInt(e.key);
-                    if (num === 1 && typeof router !== 'undefined') router.navigate('/dashboard');
-                    if (num === 2 && typeof router !== 'undefined') router.navigate('/evaluations');
-                    if (num === 3 && typeof router !== 'undefined') router.navigate('/users');
-                }
-            });
-            
-            // フォーカス管理
-            document.addEventListener('focusin', function(e) {
-                if (e.target.matches('input[type="number"]')) {
-                    e.target.select(); // 数値入力時に全選択
-                }
-            });
-            
-            // タッチデバイス対応
-            if ('ontouchstart' in window) {
-                document.body.classList.add('touch-device');
-            }
-            
-            // 高コントラストモード検出
-            if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
-                document.body.classList.add('high-contrast');
-            }
-            
-            // 動きを減らす設定検出
-            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                document.body.classList.add('reduced-motion');
-            }
-            
-            console.log('✅ Document ready - System initializing...');
-        });
-        
-        // アプリケーション準備完了時の処理
-        window.addEventListener('load', function() {
-            // パフォーマンス計測
-            if (window.performance && window.performance.timing) {
-                const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
-                console.log(`⚡ Page load time: ${loadTime}ms`);
-            }
-            
-            // システム準備完了チェック
-            setTimeout(() => {
-                if (window.CONSTRUCTION_EVAL_SYSTEM_READY) {
-                    console.log('🎉 Construction Evaluation System ready!');
+                if (success) {
+                    console.log('✅ System ready');
                     
-                    // 開発環境でのデバッグ情報
-                    if (window.APP_CONFIG?.DEBUG_MODE) {
-                        console.log('🐛 Debug mode enabled');
-                        console.log('📊 Available debug commands: window.debug');
+                    // ログイン状態チェック
+                    if (window.auth && window.auth.isLoggedIn()) {
+                        window.app.showDashboard();
                     }
                 } else {
-                    console.warn('⚠️ System may not be fully initialized');
+                    console.error('❌ System initialization failed');
                 }
-            }, 1000);
+                
+            } catch (error) {
+                console.error('⚠️ Critical error during initialization:', error);
+                
+                // フォールバック：基本的なイベントリスナーを設定
+                setupFallbackEventListeners();
+            }
+
+            console.log('🏗️ Construction Evaluation System loaded');
         });
-        
-        // エラーハンドリング
-        window.addEventListener('error', function(e) {
-            console.error('💥 Runtime error:', e.error);
+
+        // フォールバック：基本イベントリスナー設定
+        function setupFallbackEventListeners() {
+            console.log('⚠️ Setting up fallback event listeners');
             
-            // ユーザーフレンドリーなエラー表示
-            if (typeof showNotification === 'function') {
-                showNotification('システムエラーが発生しました', 'error');
+            // ログインフォーム
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // 基本的なログイン処理
+                    if (email && password) {
+                        if (window.auth) {
+                            window.auth.login(email, password);
+                        } else {
+                            alert('認証システムが利用できません。ページを再読み込みしてください。');
+                        }
+                    }
+                });
+            }
+
+            // 言語切り替え
+            const loginLangSelect = document.getElementById('login-language-select');
+            const headerLangSelect = document.getElementById('header-language-select');
+
+            if (loginLangSelect) {
+                loginLangSelect.addEventListener('change', function() {
+                    if (window.i18n) {
+                        window.i18n.setLanguage(this.value);
+                    }
+                });
+            }
+
+            if (headerLangSelect) {
+                headerLangSelect.addEventListener('change', function() {
+                    if (window.i18n) {
+                        window.i18n.setLanguage(this.value);
+                    }
+                });
+            }
+        }
+
+        // グローバルエラーハンドラー
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            
+            // ユーザーに通知
+            if (window.notifications) {
+                window.notifications.show('システムエラーが発生しました', 'error');
             }
         });
-        
+
+        // パフォーマンス監視
+        window.addEventListener('load', function() {
+            if (performance.timing) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`📊 Page load time: ${loadTime}ms`);
+            }
+        });
+
         // ネットワーク状態監視
         window.addEventListener('online', function() {
             console.log('🌐 Network: Online');
+            if (window.notifications) {
+                window.notifications.show('ネットワークに接続されました', 'success');
+            }
         });
         
         window.addEventListener('offline', function() {
             console.log('📴 Network: Offline');
+            if (window.notifications) {
+                window.notifications.show('オフラインモードで動作中', 'warning');
+            }
         });
-    </script>
-    
-    <!-- デバッグ情報（開発環境のみ） -->
-    <script>
+
+        // アクセシビリティ向上
+        document.addEventListener('keydown', function(e) {
+            // Escキーでモーダルを閉じる
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal.show');
+                modals.forEach(modal => {
+                    const closeBtn = modal.querySelector('.modal-close');
+                    if (closeBtn) closeBtn.click();
+                });
+            }
+            
+            // Alt + 1-9 でクイックナビゲーション
+            if (e.altKey && e.key >= '1' && e.key <= '9') {
+                e.preventDefault();
+                const num = parseInt(e.key);
+                if (num === 1 && window.router) window.router.navigate('/dashboard');
+                if (num === 2 && window.router) window.router.navigate('/evaluations');
+                if (num === 3 && window.router) window.router.navigate('/users');
+            }
+        });
+
+        // デバッグ情報（開発環境のみ）
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             console.log(`
 🏗️ 建設業評価システム - 開発環境
 ================================================
-📁 ファイル構成: 統合版 (7ファイル)
+📁 ファイル構成: 統合版 (6ファイル)
 📋 主要機能:
   ✅ 多言語対応 (日本語・ベトナム語・英語)
   ✅ 評価管理システム
   ✅ 五角形レーダーチャート
   ✅ ユーザー管理
   ✅ Firebase連携準備
-  ✅ PWA対応準備
   ✅ レスポンシブデザイン
 
 🎯 対象ユーザー:
