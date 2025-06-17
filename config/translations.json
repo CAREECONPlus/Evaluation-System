@@ -1,0 +1,350 @@
+{
+  "ja": {
+    "system": {
+      "title": "建設業評価システム",
+      "subtitle": "システムにログインしてください",
+      "loading": "読み込み中...",
+      "saving": "保存中...",
+      "error": "エラーが発生しました",
+      "success": "操作が完了しました"
+    },
+    "auth": {
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "login": "ログイン",
+      "logout": "ログアウト",
+      "welcome": "さん、おかえりなさい！",
+      "loginFailed": "ログインに失敗しました",
+      "demo": "デモアカウント"
+    },
+    "navigation": {
+      "dashboard": "📊 ダッシュボード",
+      "evaluations": "📋 評価一覧",
+      "users": "👥 ユーザー管理",
+      "settings": "⚙️ 設定"
+    },
+    "dashboard": {
+      "title": "📊 ダッシュボード",
+      "totalEvaluations": "総評価数",
+      "completedEvaluations": "完了済み",
+      "averageRating": "平均評価",
+      "evaluationItems": "評価項目数",
+      "recentActivity": "📈 最近の活動"
+    },
+    "evaluation": {
+      "new": "📝 新規評価作成",
+      "list": "📋 評価一覧",
+      "basicInfo": "📋 基本情報",
+      "ratings": "⭐ 項目別評価",
+      "chart": "📊 評価チャート",
+      "save": "💾 評価を保存",
+      "submit": "📤 評価を提出",
+      "edit": "✏️ 編集",
+      "delete": "🗑️ 削除",
+      "view": "👁️ 詳細表示"
+    },
+    "categories": {
+      "safety": "安全性",
+      "safetyDesc": "安全ルールの遵守、危険予知能力",
+      "quality": "品質",
+      "qualityDesc": "作業品質、仕上がりの精度",
+      "efficiency": "効率性",
+      "efficiencyDesc": "作業スピード、時間管理",
+      "teamwork": "チームワーク",
+      "teamworkDesc": "協調性、チーム貢献度",
+      "communication": "コミュニケーション",
+      "communicationDesc": "報告・連絡・相談"
+    },
+    "form": {
+      "period": "評価期間",
+      "target": "評価対象者",
+      "evaluator": "評価者",
+      "comment": "コメント",
+      "overallComment": "総合コメント",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "required": "必須",
+      "optional": "任意",
+      "notEntered": "未入力"
+    },
+    "table": {
+      "id": "ID",
+      "name": "名前",
+      "email": "メールアドレス",
+      "role": "役職",
+      "department": "部署",
+      "target": "評価対象者",
+      "evaluator": "評価者",
+      "period": "評価期間",
+      "rating": "評価",
+      "status": "ステータス",
+      "createdAt": "作成日",
+      "updatedAt": "更新日",
+      "actions": "操作"
+    },
+    "status": {
+      "draft": "下書き",
+      "submitted": "提出済み",
+      "approved": "承認済み",
+      "rejected": "差し戻し",
+      "completed": "完了"
+    },
+    "messages": {
+      "saved": "保存しました",
+      "deleted": "削除しました",
+      "submitted": "提出しました",
+      "loginSuccess": "ログインしました",
+      "logoutSuccess": "ログアウトしました",
+      "evaluationSaved": "評価を保存しました",
+      "evaluationSubmitted": "評価を提出しました",
+      "userCreated": "ユーザーを作成しました",
+      "userUpdated": "ユーザー情報を更新しました",
+      "confirmDelete": "削除してもよろしいですか？",
+      "unsavedChanges": "未保存の変更があります"
+    },
+    "construction": {
+      "safetyFirst": "安全第一",
+      "worksite": "作業現場",
+      "supervisor": "現場監督",
+      "worker": "作業員",
+      "trainee": "技能実習生",
+      "helmet": "ヘルメット",
+      "safetyVest": "安全ベスト",
+      "tools": "工具",
+      "materials": "資材",
+      "equipment": "機材"
+    }
+  },
+  "vi": {
+    "system": {
+      "title": "Hệ thống Đánh giá Ngành Xây dựng",
+      "subtitle": "Vui lòng đăng nhập vào hệ thống",
+      "loading": "Đang tải...",
+      "saving": "Đang lưu...",
+      "error": "Đã xảy ra lỗi",
+      "success": "Thao tác hoàn tất"
+    },
+    "auth": {
+      "email": "Địa chỉ email",
+      "password": "Mật khẩu",
+      "login": "Đăng nhập",
+      "logout": "Đăng xuất",
+      "welcome": ", chào mừng bạn trở lại!",
+      "loginFailed": "Đăng nhập thất bại",
+      "demo": "Tài khoản Demo"
+    },
+    "navigation": {
+      "dashboard": "📊 Bảng điều khiển",
+      "evaluations": "📋 Danh sách đánh giá",
+      "users": "👥 Quản lý người dùng",
+      "settings": "⚙️ Cài đặt"
+    },
+    "dashboard": {
+      "title": "📊 Bảng điều khiển",
+      "totalEvaluations": "Tổng số đánh giá",
+      "completedEvaluations": "Đã hoàn thành",
+      "averageRating": "Điểm trung bình",
+      "evaluationItems": "Số tiêu chí đánh giá",
+      "recentActivity": "📈 Hoạt động gần đây"
+    },
+    "evaluation": {
+      "new": "📝 Tạo đánh giá mới",
+      "list": "📋 Danh sách đánh giá",
+      "basicInfo": "📋 Thông tin cơ bản",
+      "ratings": "⭐ Đánh giá theo tiêu chí",
+      "chart": "📊 Biểu đồ đánh giá",
+      "save": "💾 Lưu đánh giá",
+      "submit": "📤 Nộp đánh giá",
+      "edit": "✏️ Chỉnh sửa",
+      "delete": "🗑️ Xóa",
+      "view": "👁️ Xem chi tiết"
+    },
+    "categories": {
+      "safety": "An toàn",
+      "safetyDesc": "Tuân thủ quy tắc an toàn, nhận biết nguy hiểm",
+      "quality": "Chất lượng",
+      "qualityDesc": "Chất lượng công việc, độ chính xác",
+      "efficiency": "Hiệu quả",
+      "efficiencyDesc": "Tốc độ làm việc, quản lý thời gian",
+      "teamwork": "Làm việc nhóm",
+      "teamworkDesc": "Khả năng hợp tác, đóng góp nhóm",
+      "communication": "Giao tiếp",
+      "communicationDesc": "Báo cáo, liên lạc, tham vấn"
+    },
+    "form": {
+      "period": "Kỳ đánh giá",
+      "target": "Người được đánh giá",
+      "evaluator": "Người đánh giá",
+      "comment": "Nhận xét",
+      "overallComment": "Nhận xét tổng thể",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "required": "Bắt buộc",
+      "optional": "Tùy chọn",
+      "notEntered": "Chưa nhập"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Tên",
+      "email": "Email",
+      "role": "Vai trò",
+      "department": "Phòng ban",
+      "target": "Người được đánh giá",
+      "evaluator": "Người đánh giá",
+      "period": "Kỳ đánh giá",
+      "rating": "Điểm",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Ngày cập nhật",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "submitted": "Đã nộp",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối",
+      "completed": "Hoàn thành"
+    },
+    "messages": {
+      "saved": "Đã lưu",
+      "deleted": "Đã xóa",
+      "submitted": "Đã nộp",
+      "loginSuccess": "Đăng nhập thành công",
+      "logoutSuccess": "Đăng xuất thành công",
+      "evaluationSaved": "Đã lưu đánh giá",
+      "evaluationSubmitted": "Đã nộp đánh giá",
+      "userCreated": "Đã tạo người dùng",
+      "userUpdated": "Đã cập nhật thông tin người dùng",
+      "confirmDelete": "Bạn có chắc chắn muốn xóa?",
+      "unsavedChanges": "Có thay đổi chưa được lưu"
+    },
+    "construction": {
+      "safetyFirst": "An toàn trên hết",
+      "worksite": "Công trường",
+      "supervisor": "Giám sát công trường",
+      "worker": "Công nhân",
+      "trainee": "Thực tập sinh kỹ năng",
+      "helmet": "Mũ bảo hiểm",
+      "safetyVest": "Áo bảo hộ",
+      "tools": "Dụng cụ",
+      "materials": "Vật liệu",
+      "equipment": "Thiết bị"
+    }
+  },
+  "en": {
+    "system": {
+      "title": "Construction Industry Evaluation System",
+      "subtitle": "Please log in to the system",
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "error": "An error occurred",
+      "success": "Operation completed"
+    },
+    "auth": {
+      "email": "Email Address",
+      "password": "Password",
+      "login": "Login",
+      "logout": "Logout",
+      "welcome": ", welcome back!",
+      "loginFailed": "Login failed",
+      "demo": "Demo Account"
+    },
+    "navigation": {
+      "dashboard": "📊 Dashboard",
+      "evaluations": "📋 Evaluations",
+      "users": "👥 User Management",
+      "settings": "⚙️ Settings"
+    },
+    "dashboard": {
+      "title": "📊 Dashboard",
+      "totalEvaluations": "Total Evaluations",
+      "completedEvaluations": "Completed",
+      "averageRating": "Average Rating",
+      "evaluationItems": "Evaluation Items",
+      "recentActivity": "📈 Recent Activity"
+    },
+    "evaluation": {
+      "new": "📝 New Evaluation",
+      "list": "📋 Evaluation List",
+      "basicInfo": "📋 Basic Information",
+      "ratings": "⭐ Ratings by Criteria",
+      "chart": "📊 Evaluation Chart",
+      "save": "💾 Save Evaluation",
+      "submit": "📤 Submit Evaluation",
+      "edit": "✏️ Edit",
+      "delete": "🗑️ Delete",
+      "view": "👁️ View Details"
+    },
+    "categories": {
+      "safety": "Safety",
+      "safetyDesc": "Safety rule compliance, hazard recognition",
+      "quality": "Quality",
+      "qualityDesc": "Work quality, finishing accuracy",
+      "efficiency": "Efficiency",
+      "efficiencyDesc": "Work speed, time management",
+      "teamwork": "Teamwork",
+      "teamworkDesc": "Cooperation, team contribution",
+      "communication": "Communication",
+      "communicationDesc": "Reporting, communication, consultation"
+    },
+    "form": {
+      "period": "Evaluation Period",
+      "target": "Evaluation Target",
+      "evaluator": "Evaluator",
+      "comment": "Comment",
+      "overallComment": "Overall Comment",
+      "save": "Save",
+      "cancel": "Cancel",
+      "required": "Required",
+      "optional": "Optional",
+      "notEntered": "Not entered"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "department": "Department",
+      "target": "Evaluation Target",
+      "evaluator": "Evaluator",
+      "period": "Period",
+      "rating": "Rating",
+      "status": "Status",
+      "createdAt": "Created",
+      "updatedAt": "Updated",
+      "actions": "Actions"
+    },
+    "status": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "messages": {
+      "saved": "Saved",
+      "deleted": "Deleted",
+      "submitted": "Submitted",
+      "loginSuccess": "Login successful",
+      "logoutSuccess": "Logout successful",
+      "evaluationSaved": "Evaluation saved",
+      "evaluationSubmitted": "Evaluation submitted",
+      "userCreated": "User created",
+      "userUpdated": "User information updated",
+      "confirmDelete": "Are you sure you want to delete?",
+      "unsavedChanges": "There are unsaved changes"
+    },
+    "construction": {
+      "safetyFirst": "Safety First",
+      "worksite": "Work Site",
+      "supervisor": "Site Supervisor",
+      "worker": "Worker",
+      "trainee": "Technical Trainee",
+      "helmet": "Helmet",
+      "safetyVest": "Safety Vest",
+      "tools": "Tools",
+      "materials": "Materials",
+      "equipment": "Equipment"
+    }
+  }
+}
