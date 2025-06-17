@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建設業評価システム</title>
+    <meta name="description" content="建設業界向け多言語対応評価システム - 日本語・ベトナム語・英語対応">
+    <meta name="keywords" content="建設業,評価システム,技能実習生,多言語対応,Vietnamese,English">
+    <meta name="author" content="Construction Evaluation System">
+    
+    <!-- PWA対応 -->
+    <meta name="theme-color" content="#244EFF">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- ファビコン -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="建設業評価システム">
+    <meta property="og:description" content="建設業界向け多言語対応評価システム">
+    <meta property="og:image" content="">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="建設業評価システム">
+    <meta property="twitter:description" content="建設業界向け多言語対応評価システム">
+    
+    <!-- 統合CSS読み込み -->
+    <link rel="stylesheet" href="assets/style.css">
+    
+    <!-- プリロード設定 -->
+    <link rel="preload" href="assets/app.js" as="script">
+    <link rel="preload" href="config/translations.json" as="fetch" crossorigin>
+</head>
+<body class="login-mode">
+    <!-- アプリケーションコンテナ -->
+    <div class="app-container">
+        
+        <!-- ヘッダー（ログイン時のみ表示） -->
+        <header id="app-header" class="app-header" style="display: none;">
+            <div class="header-content">
+                <div class="logo">
+                    <h1 id="header-title">🏗️ 建設業評価システム</h1>
+                </div>
+                <nav>
+                    <ul class="nav-menu" id="nav-menu">
+                        <!-- JavaScriptで動的生成 -->
+                    </ul>
+                </nav>
+                <div class="user-menu">
+                    <div class="user-info" id="user-info">
+                        <!-- JavaScriptで動的生成 -->
+                    </div>
+                    <div class="language-selector">
+                        <select id="header-language-select">
+                            <option value="ja">🇯🇵 日本語</option>
+                            <option value="vi">🇻🇳 Tiếng Việt</option>
+                            <option value="en">🇺🇸 English</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- ブレッドクラム（ログイン時のみ表示） -->
+        <div id="breadcrumbs" class="breadcrumbs" style="display: none;">
+            <!-- JavaScriptで動的生成 -->
+        </div>
+        
+        <!-- メインコンテンツエリア -->
+        <main id="main-content" class="main-content">
+            <!-- 初期状態：ログインページ -->
+            <div class="login-page">
+                <div class="login-container">
+                    <div class="login-header">
+                        <h1 id="login-title">🏗️ 建設業評価システム</h1>
+                        <p id="login-subtitle">システムにログインしてください</p>
+                        <div style="margin-top: 16px;">
+                            <select id="login-language-select" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                                <option value="ja">🇯🇵 日本語</option>
+                                <option value="vi">🇻🇳 Tiếng Việt</option>
+                                <option value="en">🇺🇸 English</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- ログインフォーム -->
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="email" id="email-label">メールアドレス</label>
+                            <input type="email" id="email" name="email" value="admin@company.com" required autocomplete="email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" id="password-label">パスワード</label>
+                            <input type="password" id="password" name="password" value="password123" required autocomplete="current-password">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" id="login-submit">
+                            ログイン
+                        </button>
+                    </form>
+                    
+                    <!-- デモアカウント情報 -->
+                    <div class="demo-info">
+                        <strong id="demo-title">🚀 デモアカウント</strong>
+                        <div class="demo-accounts">
+                            <div class="demo-account">
+                                <strong>管理者:</strong> admin@company.com / password123
+                                <br><small>すべての機能にアクセス可能</small>
+                            </div>
+                            <div class="demo-account">
+                                <strong>マネージャー:</strong> manager@company.com / password123
+                                <br><small>チーム評価管理が可能</small>
+                            </div>
+                            <div class="demo-account">
+                                <strong>主任:</strong> supervisor@company.com / password123
+                                <br><small>部下の評価作成が可能</small>
+                            </div>
+                        </div>
+                        
+                        <!-- システム情報 -->
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(36, 78, 255, 0.1); border-radius: 6px; font-size: 12px;">
+                            <strong>📱 対応言語:</strong> 日本語・ベトナム語・英語<br>
+                            <strong>🏗️ 対象:</strong> 建設業界・技能実習生対応<br>
+                            <strong>📊 機能:</strong> 評価管理・レーダーチャート・多言語対応
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- フッター -->
+        <footer class="app-footer">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <p>&copy; 2025 建設業評価システム. All rights reserved.</p>
+                </div>
+                <div style="font-size: 12px; opacity: 0.8;">
+                    <span>🌐 多言語対応</span> | 
+                    <span>📱 レスポンシブ</span> | 
+                    <span>🔒 セキュア</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- 通知コンテナ -->
+    <div id="notification-container" aria-live="polite">
+        <!-- 通知はJavaScriptで動的生成 -->
+    </div>
+    
+    <!-- ローディングオーバーレイ（必要時に表示） -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <div class="loading-text">読み込み中...</div>
+    </div>
+    
+    <!-- Firebase設定（オプション） -->
+    <script>
+        // Firebase設定をグローバルに公開（必要に応じて）
+        window.FIREBASE_CONFIG = null; // 実際の本番環境では設定
+        window.APP_CONFIG = {
+            GAS_TRANSLATION_API_URL: null, // Google Apps Script翻訳API
+            DEBUG_MODE: window.location.hostname === 'localhost'
+        };
+    </script>
+    
+    <!-- メイン統合JavaScript -->
+    <script src="assets/app.js"></script>
+    
+    <!-- Firebase接続（オプション） -->
+    <script src="assets/firebase-config.js" defer></script>
+    
+    <!-- 翻訳システム（オプション） -->
+    <script src="assets/translator.js" defer></script>
+    
+    <!-- 初期化完了後の処理 -->
+    <script>
+        // システム準備完了時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏗️ Construction Evaluation System');
+            console.log('📋 Status: Loading...');
+            
+            // アクセシビリティ向上
+            document.addEventListener('keydown', function(e) {
+                // Escキーでモーダルを閉じる
+                if (e.key === 'Escape') {
+                    const modals = document.querySelectorAll('.modal.show');
+                    modals.forEach(modal => {
+                        const closeBtn = modal.querySelector('.modal-close');
+                        if (closeBtn) closeBtn.click();
+                    });
+                }
+                
+                // Alt + 1-9 でクイックナビゲーション
+                if (e.altKey && e.key >= '1' && e.key <= '9') {
+                    e.preventDefault();
+                    const num = parseInt(e.key);
+                    if (num === 1 && typeof router !== 'undefined') router.navigate('/dashboard');
+                    if (num === 2 && typeof router !== 'undefined') router.navigate('/evaluations');
+                    if (num === 3 && typeof router !== 'undefined') router.navigate('/users');
+                }
+            });
+            
+            // フォーカス管理
+            document.addEventListener('focusin', function(e) {
+                if (e.target.matches('input[type="number"]')) {
+                    e.target.select(); // 数値入力時に全選択
+                }
+            });
+            
+            // タッチデバイス対応
+            if ('ontouchstart' in window) {
+                document.body.classList.add('touch-device');
+            }
+            
+            // 高コントラストモード検出
+            if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
+                document.body.classList.add('high-contrast');
+            }
+            
+            // 動きを減らす設定検出
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.body.classList.add('reduced-motion');
+            }
+            
+            console.log('✅ Document ready - System initializing...');
+        });
+        
+        // アプリケーション準備完了時の処理
+        window.addEventListener('load', function() {
+            // パフォーマンス計測
+            if (window.performance && window.performance.timing) {
+                const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+                console.log(`⚡ Page load time: ${loadTime}ms`);
+            }
+            
+            // システム準備完了チェック
+            setTimeout(() => {
+                if (window.CONSTRUCTION_EVAL_SYSTEM_READY) {
+                    console.log('🎉 Construction Evaluation System ready!');
+                    
+                    // 開発環境でのデバッグ情報
+                    if (window.APP_CONFIG?.DEBUG_MODE) {
+                        console.log('🐛 Debug mode enabled');
+                        console.log('📊 Available debug commands: window.debug');
+                    }
+                } else {
+                    console.warn('⚠️ System may not be fully initialized');
+                }
+            }, 1000);
+        });
+        
+        // エラーハンドリング
+        window.addEventListener('error', function(e) {
+            console.error('💥 Runtime error:', e.error);
+            
+            // ユーザーフレンドリーなエラー表示
+            if (typeof showNotification === 'function') {
+                showNotification('システムエラーが発生しました', 'error');
+            }
+        });
+        
+        // ネットワーク状態監視
+        window.addEventListener('online', function() {
+            console.log('🌐 Network: Online');
+        });
+        
+        window.addEventListener('offline', function() {
+            console.log('📴 Network: Offline');
+        });
+    </script>
+    
+    <!-- デバッグ情報（開発環境のみ） -->
+    <script>
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log(`
+🏗️ 建設業評価システム - 開発環境
+================================================
+📁 ファイル構成: 統合版 (7ファイル)
+📋 主要機能:
+  ✅ 多言語対応 (日本語・ベトナム語・英語)
+  ✅ 評価管理システム
+  ✅ 五角形レーダーチャート
+  ✅ ユーザー管理
+  ✅ Firebase連携準備
+  ✅ PWA対応準備
+  ✅ レスポンシブデザイン
+
+🎯 対象ユーザー:
+  👷 建設業界従事者
+  🌏 技能実習生 (ベトナム人など)
+  👨‍💼 管理者・マネージャー
+
+⚡ パフォーマンス:
+  📦 統合ファイル構成でロード時間短縮
+  🎨 CSS Variables活用で保守性向上
+  🔧 モジュール化で機能拡張容易
+
+🔧 開発者向け:
+  window.debug - デバッグユーティリティ
+  window.app.getAppInfo() - アプリ情報
+  コンソールで各種テスト関数利用可能
+================================================
+            `);
+        }
+    </script>
+</body>
+</html>
